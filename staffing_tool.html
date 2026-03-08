@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NeuraFlash · Staffing Assignment Tool</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#070c17;color:#e2e8f0;font-family:'IBM Plex Mono',monospace;font-size:11px;}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:#060b15;}
+::-webkit-scrollbar-thumb{background:#1e293b;border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:#334155;}
+button{font-family:'IBM Plex Mono',monospace;cursor:pointer;}
+input{font-family:'IBM Plex Mono',monospace;}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState,useEffect,useMemo,useCallback}=React;
+
+const SK="nf-staff-v3";
+
+const DATA={
+  dates:["Mar 8","Mar 15","Mar 22","Mar 29","Apr 5","Apr 12","Apr 19","Apr 26","May 3","May 10","May 17","May 24","May 31"],
+  tabs:[
+    {id:"agentforce",label:"Agentforce",color:"#6366F1",
+     people:[
+      {id:"p_amit",name:"Amit Agarwal",role:"Developer",skill:"Agentforce",country:"India",h:[30,22,26,27,35,35,35,35,35,35,35,35,35],tot:420},
+      {id:"p_carmen",name:"Carmen Shaw",role:"Developer",skill:"Agentforce",country:"United States",h:[-5,-5,-75,-15,-15,-15,-5,-5,15,25,25,27,35],tot:132},
+      {id:"p_dhaval",name:"Dhaval Goel",role:"Developer",skill:"Agentforce",country:"India",h:[15,-3,15,17,35,35,35,35,35,35,35,35,35],tot:362},
+      {id:"p_ankita_g",name:"Ankita Gupta",role:"Developer",skill:"Agentforce",country:"India",h:[-11,-12,-11,-5,-11,-11,-11,-11,-11,-11,-11,-11,-11],tot:0},
+      {id:"p_jill",name:"Jill Penfield",role:"Solution Architect",skill:"Agentforce",country:"United States",h:[24,25,20,25,25,25,25,25,25,25,25,17,25],tot:316},
+      {id:"p_ryan_r",name:"Ryan Rucker",role:"Solution Architect",skill:"Agentforce",country:"United States",h:[10,5,5,15,15,25,25,25,35,35,35,27,35],tot:292},
+      {id:"p_nitesh",name:"Nitesh Bagaddeo",role:"Solution Architect",skill:"Agentforce",country:"India",h:[-5,-13,15,-3,25,25,35,35,35,35,35,35,35],tot:310},
+      {id:"p_jessica",name:"Jessica Combs",role:"Solution Architect",skill:"Agentforce",country:"United States",h:[-16,5,-7,15,20,35,35,35,35,35,35,19,35],tot:304},
+      {id:"p_avi",name:"Avi Modi",role:"Technical Architect",skill:"Agentforce",country:"Canada",h:[-5,0,20,12,30,20,20,30,35,35,27,35,35],tot:299},
+      {id:"p_daniel_g",name:"Daniel González Torres",role:"Technical Architect",skill:"Agentforce",country:"Canada",h:[0,-5,-15,-18,10,5,10,10,10,35,27,35,35],tot:177},
+      {id:"p_fred",name:"Fred Hays",role:"Technical Architect",skill:"Agentforce",country:"United States",h:[5,-5,-5,10,10,5,5,15,15,15,20,17,25],tot:142},
+      {id:"p_anthony_w",name:"Anthony Warren",role:"Technical Architect",skill:"Agentforce",country:"United States",h:[0,-10,-10,-10,5,-17,15,15,15,20,20,12,35],tot:137},
+      {id:"p_jyoti_t",name:"Jyoti Tripathi",role:"Technical Architect",skill:"Agentforce",country:"Canada",h:[15,0,0,-8,22,0,0,0,-10,-10,0,5,5],tot:47},
+      {id:"p_sean_l",name:"Sean Lim",role:"Technical Architect",skill:"Agentforce",country:"Canada",h:[-5,-5,-5,-13,-5,-5,-5,-5,-5,-5,7,15,15],tot:37},
+      {id:"p_shalini",name:"Shalini Yadav",role:"Consultant",skill:"Agentforce",country:"India",h:[-5,-13,5,-3,25,35,35,35,35,35,35,35,35],tot:310},
+      {id:"p_nehal",name:"Nehal Agrawal",role:"Consultant",skill:"Agentforce",country:"India",h:[24,1,10,7,30,15,5,5,5,5,20,20,20],tot:167},
+      {id:"p_rakcha",name:"Rakcha Sharma",role:"Consultant",skill:"Agentforce",country:"India",h:[0,-8,25,-8,0,0,15,15,15,15,15,35,35],tot:170},
+      {id:"p_joey_v",name:"Joey Valente",role:"Solution Architect",skill:"Agentforce",country:"United States",h:[-5,-5,-5,-5,-5,15,15,15,15,15,15,7,15],tot:102},
+      {id:"p_dane",name:"Dane Peterson",role:"Solution Architect",skill:"Agentforce",country:"Canada",h:[-37,11,11,3,11,11,13,13,13,13,5,13,13],tot:120},
+      {id:"p_louis",name:"Louis Tedesco",role:"Solution Architect",skill:"Agentforce",country:"United States",h:[-10,-25,-20,-20,-14,-6,15,15,15,15,15,7,15],tot:97},
+      {id:"p_sarah_m",name:"Sarah McCarter",role:"Solution Architect",skill:"Agentforce",country:"United States",h:[-5,13,5,-5,5,-5,-5,-5,-5,-5,-5,1,15],tot:39},
+      {id:"p_marci",name:"Marci Noonan",role:"Solution Architect",skill:"Agentforce",country:"United States",h:[0,0,0,-20,10,0,0,0,0,0,0,-8,15],tot:25},
+      {id:"p_callie",name:"Callie Sullivan",role:"Solution Architect",skill:"Agentforce",country:"United States",h:[5,5,-5,-5,-5,-5,-20,-20,-20,0,0,-1,0],tot:10},
+      {id:"p_elliot",name:"Elliot Hebert",role:"Solution Architect",skill:"Agentforce",country:"United States",h:[0,0,1,10,0,0,0,0,0,0,0,-1,0],tot:11},
+      {id:"p_abbas",name:"Abbas Jafry",role:"Technical Architect",skill:"Agentforce",country:"India",h:[-5,-3,-5,-3,-5,-5,-5,-5,-5,-5,-5,-5,-5],tot:0}
+     ],
+     opps:[
+      {id:"o_ofi_dev",project:"OFI - AF Sales Assist & SDR",role:"Developer",skill:"Agentforce",cat:"Commit",h:[0,0,0,25,30,30,35,35,35,35,30,30,0],tot:285,status:"COVERED",suggestion:"Amit Agarwal",delay:0},
+      {id:"o_ofi_ta",project:"OFI - AF Sales Assist & SDR",role:"Technical Architect",skill:"Agentforce",cat:"Commit",h:[0,0,5,35,35,35,30,30,30,30,20,20,0],tot:270,status:"GAP",suggestion:"",delay:0},
+      {id:"o_consensus_sa",project:"Consensus Agentforce Phase 1",role:"Solution Architect",skill:"Agentforce",cat:"Best Case",h:[20,20,20,20,20,20,20,20,20,20,20,20,0],tot:240,status:"COVERED",suggestion:"Jill Penfield",delay:0},
+      {id:"o_consensus_dev",project:"Consensus Agentforce Phase 1",role:"Developer",skill:"Agentforce",cat:"Best Case",h:[20,20,20,20,20,20,20,20,20,20,20,20,0],tot:240,status:"COVERED",suggestion:"Dhaval Goel",delay:0},
+      {id:"o_tag_sa",project:"TAG - Adecco Scale SIP Funding",role:"Solution Architect",skill:"Agentforce",cat:"Strong Upside",h:[20,20,20,20,20,20,20,20,20,20,0,0,0],tot:200,status:"COVERED",suggestion:"Ryan Rucker",delay:0},
+      {id:"o_keybank_sa",project:"Key Bank - Agentic Optimization Club",role:"Solution Architect",skill:"Agentforce",cat:"Best Case",h:[0,0,0,40,40,40,40,40,40,40,40,40,40],tot:400,status:"GAP",suggestion:"",delay:0},
+      {id:"o_keybank_dev",project:"Key Bank - Agentic Optimization Club",role:"Developer",skill:"Agentforce",cat:"Best Case",h:[0,0,0,40,40,40,40,40,40,40,40,40,40],tot:400,status:"GAP",suggestion:"",delay:0},
+      {id:"o_sammons_sa",project:"Sammons Financial - Agentforce for Service",role:"Solution Architect",skill:"Agentforce",cat:"Strong Upside",h:[0,0,0,0,5,20,20,20,20,20,20,20,20],tot:165,status:"GAP",suggestion:"",delay:0},
+      {id:"o_sammons_con",project:"Sammons Financial - Agentforce for Service",role:"Consultant",skill:"Agentforce",cat:"Strong Upside",h:[0,0,0,0,5,20,20,35,35,35,35,35,35],tot:255,status:"COVERED",suggestion:"Shalini Yadav",delay:0},
+      {id:"o_snow_sa",project:"Snow Companies + Agentforce & Service Cloud",role:"Solution Architect",skill:"Agentforce",cat:"Best Case",h:[0,0,0,0,0,20,20,20,20,20,20,20,20],tot:160,status:"GAP",suggestion:"",delay:0},
+      {id:"o_intercon_sa",project:"InterCon - Agentforce Pilot",role:"Solution Architect",skill:"Agentforce",cat:"Best Case",h:[0,0,0,0,0,0,20,20,20,20,20,20,20],tot:140,status:"GAP",suggestion:"",delay:0},
+      {id:"o_macys_ta",project:"Macys - HR Tech - Agentforce Data Cloud",role:"Technical Architect",skill:"Agentforce",cat:"Strong Upside",h:[0,0,0,0,0,5,20,20,20,20,20,10,10],tot:125,status:"COVERED",suggestion:"Avi Modi",delay:0},
+      {id:"o_health_ta",project:"Health Alliance Plan of Michigan - Agentforce",role:"Technical Architect",skill:"Agentforce",cat:"Best Case",h:[0,0,0,0,0,5,10,10,10,10,10,20,20],tot:95,status:"COVERED",suggestion:"Anthony Warren",delay:5},
+      {id:"o_aquent_ta",project:"Aquent Agentforce",role:"Technical Architect",skill:"Agentforce",cat:"Best Case",h:[0,0,0,0,0,0,0,0,5,20,20,20,20],tot:85,status:"GAP",suggestion:"",delay:0},
+      {id:"o_aquent_con",project:"Aquent Agentforce",role:"Consultant",skill:"Agentforce",cat:"Best Case",h:[0,0,0,0,0,0,0,0,5,10,10,10,10],tot:45,status:"COVERED",suggestion:"Rakcha Sharma",delay:0},
+      {id:"o_health_sa",project:"Health Alliance Plan of Michigan - Agentforce",role:"Solution Architect",skill:"Agentforce",cat:"Best Case",h:[0,0,0,0,0,10,20,20,20,20,20,20,20],tot:150,status:"COVERED",suggestion:"Marci Noonan",delay:5}
+     ]
+    },
+    {id:"pmdo",label:"PM + DO",color:"#0284C7",
+     people:[
+      {id:"p_james_r",name:"James Reardon",role:"Project Manager",skill:"General",country:"United States",h:[0,4,21,21,25,35,35,35,35,35,35,27,35],tot:342},
+      {id:"p_erin",name:"Erin Hartnett",role:"Project Manager",skill:"General",country:"United States",h:[10,10,10,10,25,15,15,15,15,15,15,7,15],tot:177},
+      {id:"p_jason_amos",name:"Jason Amos",role:"Project Manager",skill:"General",country:"United States",h:[5,35,35,35,35,35,35,35,35,35,35,27,35],tot:407},
+      {id:"p_kimberly",name:"Kimberly Kinsey",role:"Project Manager",skill:"General",country:"United States",h:[5,35,35,35,35,35,35,35,35,35,35,27,35],tot:407},
+      {id:"p_kevin_w",name:"Kevin Wood",role:"Project Manager",skill:"General",country:"United States",h:[10,10,10,10,25,15,15,20,20,20,25,17,25],tot:222},
+      {id:"p_boris",name:"Boris Bosnjak",role:"Project Manager",skill:"General",country:"United States",h:[0,10,25,25,35,35,35,35,35,35,35,27,35],tot:372},
+      {id:"p_mark_c",name:"Mark Capretta",role:"Project Manager",skill:"General",country:"United States",h:[10,10,10,10,18,15,15,15,35,35,35,27,35],tot:270},
+      {id:"p_prerna",name:"Prerna Jairath",role:"Project Manager",skill:"General",country:"United States",h:[-10,-10,-10,-10,30,10,15,15,15,20,25,27,35],tot:172},
+      {id:"p_connor",name:"Connor Lamping",role:"Project Manager",skill:"General",country:"United States",h:[-5,-5,-5,-5,20,-5,-5,5,35,35,35,27,35],tot:167},
+      {id:"p_ebony",name:"Ebony Caldwell",role:"Project Manager",skill:"General",country:"United States",h:[0,0,0,10,20,20,20,20,35,35,35,27,35],tot:257},
+      {id:"p_jim_m",name:"Jim Miller",role:"Project Manager",skill:"General",country:"United States",h:[-3,0,0,0,17,15,15,15,20,25,25,17,25],tot:171},
+      {id:"p_patrick_a",name:"Patrick Auger",role:"Project Manager",skill:"General",country:"United States",h:[2,-5,10,10,10,10,15,15,15,15,15,17,25],tot:154},
+      {id:"p_joey_s",name:"Joey Scott",role:"Project Manager",skill:"General",country:"United States",h:[-5,-3,-3,8,10,10,10,10,10,15,15,7,30],tot:114},
+      {id:"p_james_ab",name:"James Abbey",role:"Project Manager",skill:"General",country:"United States",h:[5,0,-10,0,15,15,15,15,15,15,25,17,35],tot:162},
+      {id:"p_robert_h",name:"Robert Harron",role:"Project Manager",skill:"General",country:"United States",h:[-5,-5,-12,-5,10,5,5,5,15,15,15,7,25],tot:95},
+      {id:"p_patrick_j",name:"Patrick Joyce",role:"Project Manager",skill:"General",country:"United States",h:[-5,-5,-5,-2,0,10,10,10,10,10,10,2,10],tot:65},
+      {id:"p_angie",name:"Angie Choperena",role:"Project Manager",skill:"General",country:"Colombia",h:[5,5,7,-1,15,15,15,17,25,25,17,25,25],tot:195},
+      {id:"p_oladipo",name:"Oladipo Sogules",role:"Project Manager",skill:"General",country:"Canada",h:[-15,-10,-10,-13,-5,5,20,20,20,20,12,20,25],tot:120}
+     ],
+     opps:[
+      {id:"o_consensus_pm",project:"Consensus Agentforce Phase 1",role:"Project Manager",skill:"General",cat:"Best Case",h:[20,20,20,20,20,20,15,15,15,15,15,15,0],tot:190,status:"COVERED",suggestion:"James Reardon",delay:0},
+      {id:"o_ntt_pm",project:"NTT Global Data Centers - Agentforce Revenue Mgmt",role:"Project Manager",skill:"General",cat:"Strong Upside",h:[0,10,40,40,40,40,40,40,40,40,40,0,0],tot:370,status:"GAP",suggestion:"",delay:0},
+      {id:"o_ofi_pm",project:"OFI - AF Sales Assist & SDR",role:"Project Manager",skill:"General",cat:"Commit",h:[0,0,5,10,10,10,10,10,10,10,10,10,0],tot:95,status:"COVERED",suggestion:"Erin Hartnett",delay:2},
+      {id:"o_sammons_pm",project:"Sammons Financial - Agentforce for Service",role:"Project Manager",skill:"General",cat:"Strong Upside",h:[0,0,0,0,10,10,10,10,10,10,10,10,10],tot:100,status:"COVERED",suggestion:"Joey Scott",delay:4},
+      {id:"o_snow_pm",project:"Snow Companies + Agentforce & Service Cloud",role:"Project Manager",skill:"General",cat:"Best Case",h:[0,0,0,0,0,10,10,10,10,10,10,10,10],tot:80,status:"COVERED",suggestion:"Patrick Auger",delay:5},
+      {id:"o_faith_pm",project:"Faith Technologies - ASLM",role:"Project Manager",skill:"General",cat:"Best Case",h:[0,5,15,15,15,15,15,15,15,15,15,5,5],tot:155,status:"COVERED",suggestion:"Prerna Jairath",delay:1},
+      {id:"o_oncor_pm",project:"Oncor - Build, Test, Deploy, Go-Live, Support",role:"Project Manager",skill:"General",cat:"Best Case",h:[0,0,0,0,0,10,10,10,10,10,10,10,10],tot:80,status:"COVERED",suggestion:"Connor Lamping",delay:5},
+      {id:"o_consensus_do",project:"Consensus Agentforce Phase 1",role:"Delivery Owner",skill:"General",cat:"Best Case",h:[5,5,5,5,5,5,5,5,5,5,5,5,0],tot:60,status:"GAP",suggestion:"",delay:0},
+      {id:"o_ofi_do",project:"OFI - AF Sales Assist & SDR",role:"Delivery Owner",skill:"General",cat:"Commit",h:[0,0,5,5,5,5,5,5,5,5,5,5,0],tot:55,status:"GAP",suggestion:"",delay:0},
+      {id:"o_sammons_do",project:"Sammons Financial - Agentforce for Service",role:"Delivery Owner",skill:"General",cat:"Strong Upside",h:[0,0,0,0,5,5,5,5,5,5,5,5,5],tot:55,status:"GAP",suggestion:"",delay:0},
+      {id:"o_ntt_do",project:"NTT Global Data Centers - Agentforce Revenue Mgmt",role:"Delivery Owner",skill:"General",cat:"Strong Upside",h:[0,5,10,10,10,10,10,10,10,10,10,0,0],tot:95,status:"GAP",suggestion:"",delay:0},
+      {id:"o_oncor_do",project:"Oncor - Build, Test, Deploy, Go-Live, Support",role:"Delivery Owner",skill:"General",cat:"Best Case",h:[0,0,0,0,0,10,10,10,10,10,10,10,10],tot:80,status:"GAP",suggestion:"",delay:0}
+     ]
+    },
+    {id:"aws",label:"AWS",color:"#F97316",
+     people:[
+      {id:"p_manoj",name:"Manoj Kumar Suresh",role:"Solution Architect",skill:"AWS",country:"India",h:[-55,17,25,17,25,25,25,25,25,25,25,25,25],tot:284},
+      {id:"p_harish",name:"Harish Kumar S",role:"Solution Architect",skill:"AWS",country:"India",h:[-5,-13,-5,-13,-5,35,35,35,35,35,35,0,0],tot:210},
+      {id:"p_ludo",name:"Ludo Vlieger",role:"Solution Architect",skill:"AWS",country:"United States",h:[-5,-5,-5,-5,11,-5,-5,-5,35,35,35,27,35],tot:178},
+      {id:"p_coltrane",name:"Coltrane Conklin",role:"Solution Architect",skill:"AWS",country:"United States",h:[0,0,0,0,27,15,15,15,15,15,15,17,25],tot:159},
+      {id:"p_liz",name:"Liz Thompson",role:"Solution Architect",skill:"AWS",country:"United States",h:[10,5,5,5,18,10,10,15,15,17,27,17,25],tot:159},
+      {id:"p_nikody",name:"Nikody Keating",role:"Solution Architect",skill:"AWS",country:"United States",h:[0,16,0,8,7,5,5,15,15,15,15,17,25],tot:143},
+      {id:"p_jared_h",name:"Jared Hunter",role:"Solution Architect",skill:"AWS",country:"United States",h:[0,0,0,0,15,15,15,15,15,15,15,7,15],tot:127},
+      {id:"p_krishna",name:"Krishna Raman",role:"Solution Architect",skill:"AWS",country:"United States",h:[-5,-5,-5,-5,22,10,10,10,10,10,10,12,20],tot:114},
+      {id:"p_uday",name:"Uday Kumar Mamidimakulapalli",role:"Developer",skill:"AWS",country:"India",h:[-10,-18,-10,-13,-5,10,15,15,15,15,15,15,35],tot:135},
+      {id:"p_pavithra",name:"Pavithra B",role:"Developer",skill:"AWS",country:"India",h:[-5,-13,5,-13,-5,-5,-5,-5,6,15,15,30,30],tot:101},
+      {id:"p_anthony_s",name:"Anthony Storti",role:"Technical Architect",skill:"AWS",country:"United States",h:[-7,-7,-7,-7,-7,-7,-7,-7,-7,-7,-5,-13,-5],tot:0},
+      {id:"p_jyoti_r",name:"Jyoti Rathi",role:"Technical Architect",skill:"AWS",country:"United States",h:[-10,-10,-10,-10,20,-10,-10,-10,-10,-10,-10,-18,-10],tot:20}
+     ],
+     opps:[
+      {id:"o_nspi_sa",project:"NSPI - 24/7 Onward",role:"Solution Architect",skill:"AWS",cat:"Strong Upside",h:[0,0,40,40,40,40,40,40,40,40,40,40,0],tot:400,status:"COVERED",suggestion:"Harish Kumar S",delay:2},
+      {id:"o_oncor_sa_aws",project:"Oncor - Build, Test, Deploy, Go-Live, Support",role:"Solution Architect",skill:"AWS",cat:"Best Case",h:[0,0,0,0,0,35,35,35,35,35,35,35,35],tot:280,status:"COVERED",suggestion:"Ludo Vlieger",delay:5},
+      {id:"o_simonmed_sa",project:"SimonMed - Bot + real-time co-pilot",role:"Solution Architect",skill:"AWS",cat:"Best Case",h:[0,0,5,20,20,20,20,20,20,20,20,20,20],tot:185,status:"COVERED",suggestion:"Nikody Keating",delay:2},
+      {id:"o_atlas_sa",project:"Atlas Air - Cisco to Amazon Connect",role:"Solution Architect",skill:"AWS",cat:"Strong Upside",h:[0,0,0,0,0,5,20,20,20,20,20,20,20],tot:145,status:"COVERED",suggestion:"Krishna Raman",delay:5},
+      {id:"o_simonmed_ta",project:"SimonMed - Bot + real-time co-pilot",role:"Technical Architect",skill:"AWS",cat:"Best Case",h:[0,0,5,20,20,20,20,20,20,20,20,20,20],tot:185,status:"GAP",suggestion:"",delay:0},
+      {id:"o_oncor_ta_aws",project:"Oncor - Build, Test, Deploy, Go-Live, Support",role:"Technical Architect",skill:"AWS",cat:"Best Case",h:[0,0,0,0,0,35,35,35,35,35,35,35,35],tot:280,status:"GAP",suggestion:"",delay:0},
+      {id:"o_atlas_ta",project:"Atlas Air - Cisco to Amazon Connect",role:"Technical Architect",skill:"AWS",cat:"Strong Upside",h:[0,0,0,0,0,5,20,20,20,20,20,20,20],tot:145,status:"GAP",suggestion:"",delay:0},
+      {id:"o_simonmed_dev",project:"SimonMed - Bot + real-time co-pilot",role:"AWS Developer",skill:"AWS",cat:"Best Case",h:[0,0,0,0,0,5,20,20,20,20,20,20,20],tot:145,status:"GAP",suggestion:"",delay:0},
+      {id:"o_atlas_dev",project:"Atlas Air - Cisco to Amazon Connect",role:"AWS Developer",skill:"AWS",cat:"Strong Upside",h:[0,0,0,0,0,0,0,10,20,20,20,20,20],tot:110,status:"GAP",suggestion:"",delay:0}
+     ]
+    },
+    {id:"scv",label:"SCV",color:"#0EA5E9",
+     people:[
+      {id:"p_danny_t",name:"Danny Tekumalla",role:"Solution Architect",skill:"SCV",country:"United States",h:[-7,-5,-5,-5,35,15,15,15,25,25,25,17,35],tot:197},
+      {id:"p_areli",name:"Areli Wood",role:"Consultant",skill:"SCV",country:"United States",h:[-5,-5,5,5,15,15,20,20,20,20,20,17,25],tot:177},
+      {id:"p_nichole",name:"Nichole Greco",role:"Consultant",skill:"SCV",country:"United States",h:[-13,-10,-10,0,25,15,15,20,20,20,20,22,30],tot:177},
+      {id:"p_advaitha",name:"Advaitha Ettem",role:"Consultant",skill:"SCV",country:"Canada",h:[-8,-3,0,3,5,5,5,10,16,25,35,35,35],tot:175},
+      {id:"p_nate_h",name:"Nate Hebert",role:"Consultant",skill:"SCV",country:"United States",h:[0,0,0,-7,-5,1,15,15,25,25,25,17,25],tot:143},
+      {id:"p_reid",name:"Reid Birston",role:"Consultant",skill:"SCV",country:"Canada",h:[-5,-5,15,7,15,-17,15,15,15,15,7,15,15],tot:129},
+      {id:"p_dineca",name:"Dineca Walker",role:"Consultant",skill:"SCV",country:"United States",h:[12,5,-11,5,15,5,5,5,15,15,15,7,15],tot:122},
+      {id:"p_kundan",name:"Kundan Chandak",role:"Developer",skill:"SCV",country:"India",h:[-5,-13,5,-3,15,15,15,15,15,15,15,15,15],tot:140},
+      {id:"p_bhanu",name:"Bhanu Chopra",role:"Solution Architect",skill:"SCV",country:"Canada",h:[-10,15,15,7,15,15,15,15,15,15,7,15,15],tot:149}
+     ],
+     opps:[
+      {id:"o_oncor_scv",project:"Oncor - Build, Test, Deploy, Go-Live, Support",role:"Consultant",skill:"SCV",cat:"Best Case",h:[0,0,0,0,0,70,70,70,70,70,70,70,70],tot:560,status:"GAP",suggestion:"",delay:0},
+      {id:"o_nspi_dev",project:"NSPI - 24/7 Onward",role:"Developer",skill:"SCV",cat:"Strong Upside",h:[0,0,40,40,40,40,40,40,40,40,40,40,0],tot:400,status:"COVERED",suggestion:"Kundan Chandak",delay:2},
+      {id:"o_nspi_con",project:"NSPI - 24/7 Onward",role:"Consultant",skill:"SCV",cat:"Strong Upside",h:[0,0,10,10,10,10,10,10,10,10,10,10,0],tot:100,status:"COVERED",suggestion:"Dineca Walker",delay:2},
+      {id:"o_sammons_dev",project:"Sammons Financial - Agentforce for Service",role:"Developer",skill:"SCV",cat:"Strong Upside",h:[0,0,0,0,0,0,0,20,20,20,20,20,20],tot:120,status:"GAP",suggestion:"",delay:0},
+      {id:"o_newell_sa",project:"Newell Brands - SCV W/ Amazon Connect",role:"Solution Architect",skill:"SCV",cat:"Strong Upside",h:[0,0,0,0,0,0,0,0,0,5,30,30,30],tot:95,status:"COVERED",suggestion:"Danny Tekumalla",delay:0},
+      {id:"o_oncor_qa_scv",project:"Oncor - Build, Test, Deploy, Go-Live, Support",role:"Quality Assurance",skill:"SCV",cat:"Best Case",h:[0,0,0,0,0,35,35,35,35,35,35,35,35],tot:280,status:"GAP",suggestion:"",delay:0}
+     ]
+    },
+    {id:"sc",label:"Service Cloud",color:"#06B6D4",
+     people:[
+      {id:"p_nate_oc",name:"Nate O'Connor",role:"Solution Architect",skill:"Service Cloud",country:"United States",h:[0,35,35,35,35,35,35,35,35,35,35,27,35],tot:397},
+      {id:"p_james_t",name:"James Tierney",role:"Solution Architect",skill:"Service Cloud",country:"United States",h:[0,0,0,-32,35,35,35,35,35,35,35,27,35],tot:307},
+      {id:"p_pete",name:"Pete Majerle",role:"Solution Architect",skill:"Service Cloud",country:"United States",h:[0,0,0,15,35,-45,35,35,35,35,35,27,35],tot:287},
+      {id:"p_charlene",name:"Charlene Leung",role:"Solution Architect",skill:"Service Cloud",country:"Canada",h:[0,10,10,10,20,23,25,25,25,25,25,25,25],tot:248},
+      {id:"p_marcel",name:"Marcel van der Merwe",role:"Solution Architect",skill:"Service Cloud",country:"United States",h:[0,-20,-20,-36,-10,14,35,35,35,35,35,27,35],tot:271},
+      {id:"p_summer",name:"Summer Perkins",role:"Consultant",skill:"Service Cloud",country:"United States",h:[-1,0,0,9,27,35,35,35,35,35,35,27,35],tot:308},
+      {id:"p_maria",name:"Maria Petina",role:"Consultant",skill:"Service Cloud",country:"United States",h:[15,15,5,-45,-45,-27,15,35,35,35,35,27,35],tot:247},
+      {id:"p_jeremy_b",name:"Jeremy Brown",role:"Consultant",skill:"Service Cloud",country:"United States",h:[2,7,2,9,8,-2,14,14,20,35,35,27,35],tot:208},
+      {id:"p_melissa",name:"Melissa Franke",role:"Consultant",skill:"Service Cloud",country:"United States",h:[25,15,15,15,-11,15,-9,-1,25,25,35,27,35],tot:216},
+      {id:"p_austin_k",name:"Austin King",role:"Solution Architect",skill:"Service Cloud",country:"United States",h:[15,15,15,15,15,15,-17,15,15,15,15,7,15],tot:157},
+      {id:"p_mike_l",name:"Mike Lestik",role:"Solution Architect",skill:"Service Cloud",country:"United States",h:[10,-5,-5,-5,15,5,5,25,25,25,35,27,35],tot:207}
+     ],
+     opps:[
+      {id:"o_axalta_sa_sc",project:"Axalta - Agentforce Auto Quote",role:"Solution Architect",skill:"Service Cloud",cat:"Commit",h:[0,0,20,20,20,20,20,0,0,0,0,0,0],tot:100,status:"COVERED",suggestion:"Pete Majerle",delay:2},
+      {id:"o_fluidra_sa",project:"Fluidra - Service Cloud + Voice + AF4S",role:"Solution Architect",skill:"Service Cloud",cat:"Best Case",h:[0,0,0,0,0,5,30,30,30,30,20,20,20],tot:185,status:"COVERED",suggestion:"Marcel van der Merwe",delay:5},
+      {id:"o_ihg_sa",project:"IHG - iHub Discovery and POC - SOW 2",role:"Solution Architect",skill:"Service Cloud",cat:"Commit",h:[0,0,0,34,34,34,34,0,0,0,0,0,0],tot:136,status:"COVERED",suggestion:"Austin King",delay:3},
+      {id:"o_axalta_con_sc",project:"Axalta - Agentforce Auto Quote",role:"Consultant",skill:"Service Cloud",cat:"Commit",h:[0,0,20,20,20,20,20,0,0,0,0,0,0],tot:100,status:"COVERED",suggestion:"Maria Petina",delay:2},
+      {id:"o_ihg_con",project:"IHG - iHub Discovery and POC - SOW 2",role:"Consultant",skill:"Service Cloud",cat:"Commit",h:[0,0,0,20,20,20,20,0,0,0,0,0,0],tot:80,status:"COVERED",suggestion:"Summer Perkins",delay:3},
+      {id:"o_ihg_dev",project:"IHG - iHub Discovery and POC - SOW 2",role:"Developer",skill:"Service Cloud",cat:"Commit",h:[0,0,0,20,20,20,20,0,0,0,0,0,0],tot:80,status:"GAP",suggestion:"",delay:0}
+     ]
+    },
+    {id:"fs",label:"Field Service",color:"#84CC16",
+     people:[
+      {id:"p_robert_w",name:"Robert Weigel",role:"Solution Architect",skill:"Field Service",country:"United States",h:[0,35,35,35,35,35,35,35,35,35,35,27,35],tot:397},
+      {id:"p_jordan",name:"Jordan Seabolt",role:"Solution Architect",skill:"Field Service",country:"United States",h:[-15,0,15,15,35,35,19,35,35,35,35,27,35],tot:321},
+      {id:"p_jeff",name:"Jeff Fralick",role:"Solution Architect",skill:"Field Service",country:"United States",h:[-2,13,33,33,33,33,33,30,35,35,35,27,35],tot:374},
+      {id:"p_frisine",name:"Frisine Heyvaert",role:"Solution Architect",skill:"Field Service",country:"Colombia",h:[-5,-5,-3,-11,35,35,35,27,35,35,27,35,35],tot:299},
+      {id:"p_faraz",name:"Faraz Khan",role:"Consultant",skill:"Field Service",country:"India",h:[20,12,20,12,20,30,30,30,30,30,30,30,30],tot:324},
+      {id:"p_rosalinda",name:"Rosalinda Alford",role:"Consultant",skill:"Field Service",country:"United States",h:[-5,-5,25,25,35,35,35,3,19,35,35,27,35],tot:304},
+      {id:"p_zach",name:"Zach Thomas",role:"Consultant",skill:"Field Service",country:"United States",h:[0,0,0,0,33,25,25,25,35,35,35,17,27],tot:257},
+      {id:"p_holly",name:"Holly Barnhill",role:"Consultant",skill:"Field Service",country:"United States",h:[1,3,7,7,12,12,12,16,30,30,30,22,30],tot:212}
+     ],
+     opps:[
+      {id:"o_faith_sa",project:"Faith Technologies - ASLM",role:"Solution Architect",skill:"Field Service",cat:"Best Case",h:[0,5,20,20,20,10,10,10,10,10,10,10,10],tot:145,status:"COVERED",suggestion:"Jeff Fralick",delay:1},
+      {id:"o_ccs_sa",project:"CCS - Transportation Project Implementation",role:"Solution Architect",skill:"Field Service",cat:"Best Case",h:[0,0,0,0,20,40,40,40,40,40,40,40,40],tot:300,status:"COVERED",suggestion:"Jordan Seabolt",delay:4},
+      {id:"o_ssgp_sa",project:"SSGP Field Service - RCA & Billing",role:"Solution Architect",skill:"Field Service",cat:"Best Case",h:[0,0,0,0,0,0,0,0,0,5,20,20,20],tot:65,status:"COVERED",suggestion:"Robert Weigel",delay:0},
+      {id:"o_faith_con",project:"Faith Technologies - ASLM",role:"Consultant",skill:"Field Service",cat:"Best Case",h:[0,5,20,20,20,20,20,20,20,20,20,5,5],tot:175,status:"COVERED",suggestion:"Rosalinda Alford",delay:1},
+      {id:"o_ccs_con",project:"CCS - Transportation Project Implementation",role:"Consultant",skill:"Field Service",cat:"Best Case",h:[0,0,0,0,0,0,0,20,40,40,40,40,40],tot:220,status:"COVERED",suggestion:"Holly Barnhill",delay:7},
+      {id:"o_ssgp_con",project:"SSGP Field Service - RCA & Billing",role:"Consultant",skill:"Field Service",cat:"Best Case",h:[0,0,0,0,0,0,0,0,0,5,20,20,20],tot:65,status:"COVERED",suggestion:"Zach Thomas",delay:0}
+     ]
+    },
+    {id:"rlm",label:"RLM / CPQ",color:"#F59E0B",
+     people:[
+      {id:"p_john_l",name:"John Larson",role:"Consultant",skill:"CPQ",country:"United States",h:[15,25,35,35,35,35,35,35,35,35,35,27,35],tot:421},
+      {id:"p_adel",name:"Adel Massarani",role:"Consultant",skill:"CPQ",country:"United States",h:[10,10,10,10,26,30,30,30,30,30,30,-2,30],tot:306},
+      {id:"p_evan",name:"Evan Chen",role:"Consultant",skill:"CPQ",country:"United States",h:[15,15,15,-65,-45,15,15,15,15,15,15,7,15],tot:152},
+      {id:"p_perry",name:"Perry Demetriades",role:"Solution Architect",skill:"CPQ",country:"United States",h:[-5,-5,-5,-5,-5,15,15,35,35,35,35,27,35],tot:222},
+      {id:"p_greg",name:"Greg Mahoney",role:"Solution Architect",skill:"CPQ",country:"United States",h:[10,10,15,15,17,15,10,15,15,15,15,7,15],tot:168},
+      {id:"p_taylor",name:"Taylor Portner",role:"Solution Architect",skill:"CPQ",country:"United States",h:[-5,-37,-5,-5,9,-5,-5,-5,35,35,35,27,35],tot:166}
+     ],
+     opps:[
+      {id:"o_ntt_rlm_sa",project:"NTT Global Data Centers - Agentforce Revenue Mgmt",role:"Solution Architect",skill:"RLM",cat:"Strong Upside",h:[0,10,40,40,40,40,40,40,40,40,40,0,0],tot:370,status:"GAP",suggestion:"",delay:0},
+      {id:"o_global_rlm_sa",project:"Global Finishing Solutions",role:"Solution Architect",skill:"RLM",cat:"Strong Upside",h:[0,0,0,5,40,40,40,40,40,20,0,0,0],tot:225,status:"GAP",suggestion:"",delay:0},
+      {id:"o_ntt_rlm_con",project:"NTT Global Data Centers - Agentforce Revenue Mgmt",role:"Consultant",skill:"RLM",cat:"Strong Upside",h:[0,5,40,40,20,20,20,20,20,20,20,0,0],tot:225,status:"GAP",suggestion:"",delay:0},
+      {id:"o_axalta_cpq_sa",project:"Axalta - CPQ Optimization (North America)",role:"Solution Architect",skill:"CPQ",cat:"Commit",h:[0,0,35,35,35,35,0,0,0,0,0,0,0],tot:140,status:"COVERED",suggestion:"Greg Mahoney",delay:2},
+      {id:"o_lytx_cpq_sa",project:"Lytx Lightning Revamp Sow#4",role:"Solution Architect",skill:"CPQ",cat:"Best Case",h:[0,0,0,0,15,20,20,20,20,20,20,20,10],tot:165,status:"COVERED",suggestion:"Perry Demetriades",delay:4},
+      {id:"o_axalta_cpq_con",project:"Axalta - CPQ Optimization (North America)",role:"Consultant",skill:"CPQ",cat:"Commit",h:[0,0,20,20,20,20,0,0,0,0,0,0,0],tot:80,status:"COVERED",suggestion:"Adel Massarani",delay:2}
+     ]
+    },
+    {id:"sfta",label:"SF TAs",color:"#64748B",
+     people:[
+      {id:"p_amit_sharma",name:"Amit Sharma",role:"Technical Architect",skill:"Salesforce",country:"Canada",h:[0,0,0,-8,35,35,35,35,35,35,27,35,35],tot:352},
+      {id:"p_rahul_d",name:"Rahul Dhanendran",role:"Technical Architect",skill:"Salesforce",country:"Canada",h:[-5,-25,-5,17,31,35,35,35,35,35,27,35,35],tot:323},
+      {id:"p_david_j",name:"David Jaglowski",role:"Technical Architect",skill:"Salesforce",country:"United States",h:[-20,-5,-5,-5,13,13,35,35,35,35,35,27,35],tot:263},
+      {id:"p_savio",name:"Savio Jose",role:"Technical Architect",skill:"Salesforce",country:"Canada",h:[-5,-5,-5,-13,-5,35,35,35,35,35,27,35,35],tot:267},
+      {id:"p_nitin_v",name:"Nitin Vyas",role:"Technical Architect",skill:"Salesforce",country:"India",h:[4,-4,5,-3,25,25,25,25,35,35,35,25,35],tot:270},
+      {id:"p_sebastian",name:"Sebastian Cubillos",role:"Technical Architect",skill:"Salesforce",country:"Colombia",h:[-4,-4,-12,-20,31,31,31,23,35,35,27,35,35],tot:283},
+      {id:"p_cale",name:"Cale Monson",role:"Technical Architect",skill:"Salesforce",country:"United States",h:[10,25,20,5,10,15,15,15,15,15,35,27,35],tot:242}
+     ],
+     opps:[
+      {id:"o_ihg_ta",project:"IHG - iHub Discovery and POC - SOW 2",role:"Technical Architect",skill:"Salesforce",cat:"Commit",h:[0,0,0,20,20,20,20,0,0,0,0,0,0],tot:80,status:"COVERED",suggestion:"Cale Monson",delay:3},
+      {id:"o_affirm_ta",project:"Affirm - Agentforce Employee Agent",role:"Technical Architect",skill:"",cat:"Strong Upside",h:[0,20,20,20,20,20,20,20,20,0,0,0,0],tot:160,status:"COVERED",suggestion:"Cale Monson",delay:1},
+      {id:"o_ntt_ta_int",project:"NTT Global Data Centers - Agentforce Revenue Mgmt",role:"Technical Architect",skill:"Integrations",cat:"Strong Upside",h:[0,10,40,40,40,40,40,40,40,40,40,0,0],tot:370,status:"GAP",suggestion:"",delay:0},
+      {id:"o_ccs_ta_int",project:"CCS - Transportation Project Implementation",role:"Technical Architect",skill:"Integrations",cat:"Best Case",h:[0,0,0,0,20,40,40,40,20,20,20,20,20],tot:240,status:"GAP",suggestion:"",delay:0},
+      {id:"o_lytx_ta_int",project:"Lytx Lightning Revamp Sow#4",role:"Technical Architect",skill:"Integrations",cat:"Best Case",h:[0,0,0,0,20,20,20,20,20,20,20,20,10],tot:170,status:"GAP",suggestion:"",delay:0},
+      {id:"o_fluidra_ta_int",project:"Fluidra - Service Cloud + Voice + AF4S",role:"Technical Architect",skill:"Integrations",cat:"Best Case",h:[0,0,0,0,0,5,20,20,20,20,10,10,10],tot:115,status:"GAP",suggestion:"",delay:0}
+     ]
+    },
+    {id:"cm",label:"Change Mgmt",color:"#059669",
+     people:[
+      {id:"p_cm1",name:"CM Resource 1",role:"Change Management",skill:"",country:"United States",h:[0,0,0,0,0,0,0,0,0,0,0,0,0],tot:0},
+      {id:"p_cm2",name:"CM Resource 2",role:"Change Management",skill:"",country:"United States",h:[0,0,0,0,0,0,0,0,0,0,0,0,0],tot:0},
+      {id:"p_cm3",name:"CM Resource 3",role:"Change Management",skill:"",country:"United States",h:[0,0,0,0,0,0,0,0,0,0,0,0,0],tot:0}
+     ],
+     opps:[
+      {id:"o_lytx_cm",project:"Lytx Lightning Revamp Sow#4",role:"Change Management",skill:"General",cat:"Best Case",h:[0,0,0,0,10,10,10,10,10,10,10,10,5],tot:85,status:"GAP",suggestion:"",delay:0},
+      {id:"o_ccs_cm",project:"CCS - Transportation Project Implementation",role:"Change Management",skill:"General",cat:"Best Case",h:[0,0,0,0,5,5,5,5,5,5,5,5,5],tot:50,status:"GAP",suggestion:"",delay:0},
+      {id:"o_fluidra_cm",project:"Fluidra - Service Cloud + Voice + AF4S",role:"Change Management",skill:"",cat:"Best Case",h:[0,0,0,0,0,10,10,10,10,10,10,10,10],tot:80,status:"GAP",suggestion:"",delay:0},
+      {id:"o_simonmed_cm",project:"SimonMed - Bot + real-time co-pilot",role:"Change Management",skill:"SCV",cat:"Best Case",h:[0,0,0,0,0,0,10,10,10,10,10,0,0],tot:50,status:"GAP",suggestion:"",delay:0},
+      {id:"o_newell_cm",project:"Newell Brands - SCV W/ Amazon Connect",role:"Change Management",skill:"SCV",cat:"Strong Upside",h:[0,0,0,0,0,0,0,0,0,0,15,15,15],tot:45,status:"GAP",suggestion:"",delay:0}
+     ]
+    },
+    {id:"qa",label:"QA",color:"#7C3AED",
+     people:[
+      {id:"p_sunny_t",name:"Sunny Rajendrasingh Tawar",role:"Quality Assurance",skill:"General",country:"India",h:[5,-3,15,7,5,-5,-5,-5,-5,15,15,15,15],tot:87},
+      {id:"p_manisha_a",name:"Manisha Agarwal",role:"Quality Assurance",skill:"General",country:"India",h:[0,-18,5,-1,-15,-5,-5,-5,5,15,15,15,15],tot:70},
+      {id:"p_alok",name:"Alok Kumar",role:"Quality Assurance",skill:"General",country:"India",h:[5,-8,-5,-3,5,5,5,5,5,5,5,5,5],tot:50},
+      {id:"p_jim_p",name:"Jim Pomroy",role:"Quality Assurance",skill:"General",country:"United States",h:[-10,-5,-5,-5,-5,-5,-5,-5,15,15,15,7,15],tot:45}
+     ],
+     opps:[
+      {id:"o_fluidra_qa",project:"Fluidra - Service Cloud + Voice + AF4S",role:"Quality Assurance",skill:"General",cat:"Best Case",h:[0,0,0,0,0,0,0,0,0,0,10,10,10],tot:30,status:"COVERED",suggestion:"Alok Kumar",delay:0},
+      {id:"o_oncor_qa_aws",project:"Oncor - Build, Test, Deploy, Go-Live, Support",role:"Quality Assurance",skill:"AWS",cat:"Best Case",h:[0,0,0,0,0,0,0,0,0,10,10,10,10],tot:40,status:"GAP",suggestion:"",delay:0},
+      {id:"o_atlas_qa",project:"Atlas Air - Cisco to Amazon Connect",role:"Quality Assurance",skill:"AWS",cat:"Strong Upside",h:[0,0,0,0,0,0,0,0,0,10,10,10,10],tot:40,status:"GAP",suggestion:"",delay:0}
+     ]
+    }
+  ]
+};
+
+const CAT_FG={Commit:"#10b981","Strong Upside":"#f59e0b","Best Case":"#818cf8"};
+const CAT_BG={Commit:"#052e16","Strong Upside":"#451a03","Best Case":"#1e1b4b"};
+const FL=c=>c==="United States"?"🇺🇸":c==="India"?"🇮🇳":c==="Canada"?"🇨🇦":c==="Colombia"?"🇨🇴":"🌐";
+
+function WC({v,t}){
+  if(!v||v===0)return<td style={{width:36,padding:"1px",textAlign:"center"}}><span style={{fontSize:8,color:"#111827"}}>·</span></td>;
+  let bg,fg,disp=v;
+  if(t==="s"){
+    if(v<0){bg="#2d0000";fg="#ef4444";}
+    else if(v>=25){bg="#052e16";fg="#34d399";}
+    else if(v>=10){bg="#0c2a1a";fg="#6ee7b7";}
+    else{bg="#1a2535";fg="#4a6080";}
+  }else if(t==="d"){
+    if(v>=35){bg="#3b1500";fg="#fb923c";}
+    else if(v>=20){bg="#2d1a00";fg="#fbbf24";}
+    else{bg="#1c1500";fg="#fde68a";}
+  }else{
+    disp=v>0?`+${v}`:v;
+    if(v>=15){bg="#052e16";fg="#34d399";}
+    else if(v>=0){bg="#0c2a1a";fg="#86efac";}
+    else if(v>=-10){bg="#2d0f0f";fg="#f87171";}
+    else{bg="#3b0000";fg="#ef4444";}
+  }
+  return<td style={{width:36,padding:"1px",textAlign:"center"}}><div style={{background:bg,color:fg,fontSize:8,fontWeight:700,borderRadius:2,padding:"2px 0",minWidth:30,textAlign:"center",margin:"0 auto"}}>{disp}</div></td>;
+}
+
+function Picker({opp,people,usedNames,onPick,onClose}){
+  const[q,setQ]=useState("");
+  const avail=people.filter(p=>!usedNames.has(p.name)&&p.tot>0&&p.name.toLowerCase().includes(q.toLowerCase()));
+  const bench=people.filter(p=>p.tot===0&&p.name.toLowerCase().includes(q.toLowerCase()));
+  return(
+    <div onClick={onClose} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.85)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
+      <div onClick={e=>e.stopPropagation()} style={{background:"#0d1424",border:"1px solid #1e293b",borderRadius:10,width:"100%",maxWidth:480,maxHeight:"80vh",display:"flex",flexDirection:"column",overflow:"hidden"}}>
+        <div style={{padding:"16px 20px",borderBottom:"1px solid #0f172a"}}>
+          <div style={{fontSize:13,fontWeight:800,color:"#f1f5f9",marginBottom:2}}>Assign Person</div>
+          <div style={{fontSize:10,color:"#818cf8",fontWeight:600}}>{opp.project}</div>
+          <div style={{fontSize:9,color:"#475569",marginTop:2}}>{opp.role}{opp.skill?` / ${opp.skill}`:""} · {opp.tot}h total</div>
+        </div>
+        <div style={{padding:"10px 16px",borderBottom:"1px solid #0f172a"}}>
+          <input value={q} onChange={e=>setQ(e.target.value)} placeholder="Search by name…" autoFocus
+            style={{width:"100%",padding:"7px 10px",background:"#111827",border:"1px solid #1e293b",borderRadius:6,color:"#e2e8f0",fontSize:11,outline:"none"}}/>
+        </div>
+        <div style={{overflowY:"auto",padding:"8px 12px",flex:1}}>
+          {avail.length>0&&<div style={{fontSize:8,color:"#34d399",textTransform:"uppercase",letterSpacing:"0.1em",padding:"4px 4px 6px",fontWeight:700}}>Available — {avail.length} people</div>}
+          {avail.map(p=>(
+            <div key={p.id} onClick={()=>onPick(p.name)}
+              style={{padding:"9px 12px",borderRadius:7,cursor:"pointer",marginBottom:4,background:"#111827",border:"1px solid #1e293b",display:"flex",alignItems:"center",justifyContent:"space-between"}}
+              onMouseEnter={e=>{e.currentTarget.style.borderColor="#6366f1";e.currentTarget.style.background="#13192e";}}
+              onMouseLeave={e=>{e.currentTarget.style.borderColor="#1e293b";e.currentTarget.style.background="#111827";}}>
+              <div>
+                <div style={{fontSize:11,fontWeight:700,color:"#e2e8f0"}}>{FL(p.country)} {p.name}</div>
+                <div style={{fontSize:9,color:"#475569"}}>{p.role} · {p.country}</div>
+              </div>
+              <div style={{textAlign:"right"}}>
+                <div style={{fontSize:12,fontWeight:800,color:"#34d399"}}>{p.tot}h</div>
+                <div style={{fontSize:8,color:"#334155"}}>avail</div>
+              </div>
+            </div>
+          ))}
+          {bench.length>0&&<>
+            <div style={{fontSize:8,color:"#334155",textTransform:"uppercase",letterSpacing:"0.1em",padding:"8px 4px 6px",marginTop:4}}>Bench / 0h ({bench.length})</div>
+            {bench.map(p=>(
+              <div key={p.id} onClick={()=>onPick(p.name)}
+                style={{padding:"7px 12px",borderRadius:7,cursor:"pointer",marginBottom:3,background:"#0a1020",border:"1px solid #0f172a",display:"flex",alignItems:"center",justifyContent:"space-between",opacity:0.65}}
+                onMouseEnter={e=>{e.currentTarget.style.opacity="1";e.currentTarget.style.borderColor="#334155";}}
+                onMouseLeave={e=>{e.currentTarget.style.opacity="0.65";e.currentTarget.style.borderColor="#0f172a";}}>
+                <div>
+                  <div style={{fontSize:11,color:"#94a3b8"}}>{FL(p.country)} {p.name}</div>
+                  <div style={{fontSize:9,color:"#334155"}}>{p.role}</div>
+                </div>
+                <span style={{fontSize:9,color:"#1e293b"}}>0h</span>
+              </div>
+            ))}
+          </>}
+          {avail.length===0&&bench.length===0&&<div style={{padding:"20px 0",textAlign:"center",color:"#334155",fontSize:11}}>No people match "{q}"</div>}
+        </div>
+        <div style={{padding:"10px 16px",borderTop:"1px solid #0f172a"}}>
+          <button onClick={onClose} style={{width:"100%",padding:"8px",background:"transparent",border:"1px solid #1e293b",color:"#475569",borderRadius:6,fontSize:10,cursor:"pointer"}}>Cancel</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function App(){
+  const[asgn,setAsgn]=useState({});
+  const[tab,setTab]=useState("agentforce");
+  const[picker,setPicker]=useState(null);
+  const[saved,setSaved]=useState(false);
+  const[ready,setReady]=useState(false);
+
+  useEffect(()=>{
+    try{const r=localStorage.getItem(SK);if(r)setAsgn(JSON.parse(r));}catch(e){}
+    setReady(true);
+  },[]);
+
+  useEffect(()=>{
+    if(!ready)return;
+    try{localStorage.setItem(SK,JSON.stringify(asgn));setSaved(true);setTimeout(()=>setSaved(false),1200);}catch(e){}
+  },[asgn,ready]);
+
+  const cur=DATA.tabs.find(t=>t.id===tab)||DATA.tabs[0];
+
+  const liveGaps=useMemo(()=>{
+    const g={};
+    for(const t of DATA.tabs){
+      g[t.id]=t.opps.filter(o=>!asgn[o.id]&&o.status==="GAP").length;
+    }
+    return g;
+  },[asgn]);
+
+  const totalGaps=useMemo(()=>Object.values(liveGaps).reduce((s,v)=>s+v,0),[liveGaps]);
+  const totalAsgn=Object.keys(asgn).length;
+  const allOpps=DATA.tabs.flatMap(t=>t.opps);
+  const totalCovered=allOpps.filter(o=>asgn[o.id]||(o.status==="COVERED"&&!asgn[o.id])).length;
+
+  const usedNames=useMemo(()=>new Set(Object.values(asgn)),[asgn]);
+
+  const assign=(oid,name)=>setAsgn(p=>({...p,[oid]:name}));
+  const unassign=oid=>setAsgn(p=>{const n={...p};delete n[oid];return n;});
+
+  const dates=DATA.dates;
+
+  const sw=Array(13).fill(0);
+  const dw=Array(13).fill(0);
+  cur.people.forEach(p=>p.h.forEach((v,i)=>{if(v>0)sw[i]+=v;}));
+  cur.opps.forEach(o=>o.h.forEach((v,i)=>{if(v>0)dw[i]+=v;}));
+  const nw=sw.map((s,i)=>Math.round(s-dw[i]));
+
+  const sortedOpps=[...cur.opps].sort((a,b)=>{
+    const po={Commit:0,"Strong Upside":1,"Best Case":2};
+    return(po[a.cat]||3)-(po[b.cat]||3)||b.tot-a.tot;
+  });
+
+  return(
+    <div style={{minHeight:"100vh",background:"#070c17",color:"#e2e8f0",fontFamily:"'IBM Plex Mono',monospace",fontSize:11}}>
+
+      {/* HEADER */}
+      <div style={{padding:"8px 14px",borderBottom:"1px solid #0a1020",background:"#060b15",display:"flex",alignItems:"center",gap:14,flexWrap:"wrap",position:"sticky",top:0,zIndex:100}}>
+        <div>
+          <div style={{fontSize:8,color:"#334155",letterSpacing:"0.18em",textTransform:"uppercase"}}>NeuraFlash · Mar–May 2026</div>
+          <div style={{fontSize:14,fontWeight:800,color:"#f1f5f9",letterSpacing:"-0.02em",lineHeight:1.2}}>Staffing Assignment Tool</div>
+        </div>
+        <div style={{flex:1}}/>
+        <div style={{display:"flex",gap:16,alignItems:"center",flexWrap:"wrap"}}>
+          {[
+            {v:totalAsgn,l:"Assigned",c:"#818cf8"},
+            {v:totalCovered,l:"Covered",c:"#34d399"},
+            {v:totalGaps,l:"Gaps Left",c:totalGaps>0?"#ef4444":"#34d399"}
+          ].map(x=>(
+            <div key={x.l} style={{textAlign:"center",minWidth:46}}>
+              <div style={{fontSize:20,fontWeight:800,color:x.c,lineHeight:1}}>{x.v}</div>
+              <div style={{fontSize:7,color:"#334155",textTransform:"uppercase",letterSpacing:"0.08em",marginTop:1}}>{x.l}</div>
+            </div>
+          ))}
+          <span style={{fontSize:8,color:saved?"#34d399":"#1a2535",transition:"color 0.5s",fontStyle:"italic",minWidth:60}}>{saved?"✓ saved":"auto-save"}</span>
+          <button onClick={()=>{if(window.confirm("Reset all manual assignments?"))setAsgn({});}}
+            style={{padding:"4px 10px",background:"transparent",border:"1px solid #3b0000",color:"#ef4444",borderRadius:5,fontSize:9,cursor:"pointer"}}>
+            Reset All
+          </button>
+        </div>
+      </div>
+
+      {/* TABS */}
+      <div style={{display:"flex",overflowX:"auto",borderBottom:"1px solid #0a1020",background:"#050a14",padding:"0 6px"}}>
+        {DATA.tabs.map(t=>{
+          const g=liveGaps[t.id]||0;
+          const act=tab===t.id;
+          return(
+            <button key={t.id} onClick={()=>setTab(t.id)}
+              style={{padding:"7px 12px",border:"none",borderBottom:`2px solid ${act?t.color:"transparent"}`,background:act?"#0d1424":"transparent",
+                      color:act?"#f1f5f9":"#475569",cursor:"pointer",fontSize:10,fontWeight:act?700:400,whiteSpace:"nowrap",
+                      display:"flex",alignItems:"center",gap:5,transition:"all 0.12s",outline:"none"}}>
+              <span style={{width:5,height:5,borderRadius:"50%",background:t.color,opacity:act?1:0.3,flexShrink:0,display:"inline-block"}}/>
+              {t.label}
+              {g>0&&<span style={{fontSize:7,background:"#3b0000",color:"#ef4444",padding:"0 4px",borderRadius:8,fontWeight:800,lineHeight:"15px"}}>{g}</span>}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* TABLE */}
+      <div style={{overflowX:"auto"}}>
+        <table style={{borderCollapse:"collapse",minWidth:960,width:"100%"}}>
+          <thead>
+            <tr style={{background:"#050a14",borderBottom:"2px solid #0a1020"}}>
+              <th style={{padding:"5px 12px",textAlign:"left",fontSize:8,color:"#334155",fontWeight:400,textTransform:"uppercase",letterSpacing:"0.1em",minWidth:200,position:"sticky",left:0,background:"#050a14",zIndex:10}}>Name / Opportunity</th>
+              <th style={{padding:"5px 8px",textAlign:"left",fontSize:8,color:"#334155",fontWeight:400,textTransform:"uppercase",letterSpacing:"0.1em",minWidth:200}}>Assignment</th>
+              <th style={{padding:"5px 6px",textAlign:"center",fontSize:8,color:"#334155",fontWeight:400,width:44}}>Hrs</th>
+              {dates.map(d=><th key={d} style={{padding:"3px 1px",textAlign:"center",fontSize:7,color:"#334155",fontWeight:400,width:36,whiteSpace:"nowrap"}}>{d}</th>)}
+            </tr>
+          </thead>
+          <tbody>
+            {/* ── SUPPLY ── */}
+            <tr>
+              <td colSpan={3+dates.length} style={{padding:"6px 12px 2px",background:"#050a14"}}>
+                <span style={{fontSize:8,fontWeight:700,color:"#34d399",textTransform:"uppercase",letterSpacing:"0.14em",borderBottom:"1px solid #052e16",paddingBottom:2,display:"inline-block"}}>
+                  ▲ Supply · {cur.people.length} people
+                </span>
+              </td>
+            </tr>
+            {cur.people.map((p,i)=>{
+              const asgnOid=Object.keys(asgn).find(oid=>asgn[oid]===p.name);
+              const asgnProj=asgnOid?allOpps.find(o=>o.id===asgnOid)?.project:null;
+              const bg=asgnOid?"#03100a":(i%2===0?"transparent":"#07101a");
+              return(
+                <tr key={p.id} style={{background:bg,borderBottom:"1px solid #080f1a"}}>
+                  <td style={{padding:"3px 12px",position:"sticky",left:0,background:bg,zIndex:5}}>
+                    <div style={{display:"flex",alignItems:"center",gap:5}}>
+                      <span style={{fontSize:11,fontWeight:600,color:asgnOid?"#34d399":"#94a3b8"}}>{p.name}</span>
+                      <span style={{fontSize:10}}>{FL(p.country)}</span>
+                    </div>
+                    <div style={{fontSize:8,color:"#334155",marginTop:1}}>{p.role}{p.skill?` · ${p.skill}`:""}</div>
+                  </td>
+                  <td style={{padding:"3px 8px"}}>
+                    {asgnProj
+                      ?<span style={{fontSize:9,color:"#34d399",fontStyle:"italic"}}>✓ {asgnProj.length>42?asgnProj.slice(0,40)+"…":asgnProj}</span>
+                      :<span style={{fontSize:9,color:"#1a2535"}}>—</span>}
+                  </td>
+                  <td style={{padding:"3px 6px",textAlign:"center"}}>
+                    <span style={{fontSize:10,fontWeight:800,color:asgnOid?"#34d399":p.tot>0?"#6ee7b7":"#1a2535"}}>{p.tot}</span>
+                  </td>
+                  {p.h.map((v,j)=><WC key={j} v={v} t="s"/>)}
+                </tr>
+              );
+            })}
+            <tr style={{borderTop:"1px solid #0a1020",background:"#050a14"}}>
+              <td style={{padding:"3px 12px",fontSize:9,fontWeight:800,color:"#34d399",textTransform:"uppercase",letterSpacing:"0.06em",position:"sticky",left:0,background:"#050a14",zIndex:5}}>Total Supply</td>
+              <td/>
+              <td style={{padding:"3px 6px",textAlign:"center",fontSize:10,fontWeight:800,color:"#34d399"}}>{cur.people.reduce((s,p)=>s+p.tot,0)}</td>
+              {sw.map((v,i)=><td key={i} style={{padding:"1px",textAlign:"center"}}><div style={{fontSize:8,fontWeight:800,color:"#34d399",background:"#052e16",borderRadius:2,padding:"2px 0",textAlign:"center"}}>{v||"·"}</div></td>)}
+            </tr>
+
+            <tr><td colSpan={3+dates.length} style={{height:12,background:"#050a14"}}></td></tr>
+
+            {/* ── DEMAND ── */}
+            <tr>
+              <td colSpan={3+dates.length} style={{padding:"6px 12px 2px",background:"#050a14"}}>
+                <span style={{fontSize:8,fontWeight:700,color:"#fbbf24",textTransform:"uppercase",letterSpacing:"0.14em",borderBottom:"1px solid #451a03",paddingBottom:2,display:"inline-block"}}>
+                  ▼ Demand · {cur.opps.length} opps · {liveGaps[tab]||0} gaps
+                </span>
+              </td>
+            </tr>
+            {sortedOpps.map((o,i)=>{
+              const aname=asgn[o.id];
+              const isGap=!aname&&o.status==="GAP";
+              const isCovered=!aname&&o.status==="COVERED";
+              const takenSuggestion=o.suggestion&&usedNames.has(o.suggestion)&&!aname;
+              const bg=aname?"#03100a":isGap?"#120303":(i%2===0?"transparent":"#07101a");
+              const icon=aname?"✓":isGap?"✗":o.delay>0?"~":"✓";
+              const iconC=aname?"#34d399":isGap?"#ef4444":o.delay>0?"#fbbf24":"#34d399";
+              return(
+                <tr key={o.id} style={{background:bg,borderBottom:"1px solid #080f1a"}}>
+                  <td style={{padding:"4px 12px",position:"sticky",left:0,background:bg,zIndex:5}}>
+                    <div style={{display:"flex",alignItems:"flex-start",gap:5}}>
+                      <span style={{fontSize:12,color:iconC,fontWeight:800,flexShrink:0,lineHeight:"16px"}}>{icon}</span>
+                      <div>
+                        <div style={{fontSize:10,fontWeight:700,color:"#e2e8f0",lineHeight:1.3}}>{o.project.length>46?o.project.slice(0,44)+"…":o.project}</div>
+                        <div style={{display:"flex",gap:4,marginTop:2,flexWrap:"wrap",alignItems:"center"}}>
+                          <span style={{fontSize:7,color:CAT_FG[o.cat]||"#94a3b8",background:CAT_BG[o.cat]||"#0f172a",padding:"0 5px",borderRadius:6,fontWeight:700,lineHeight:"15px"}}>{o.cat}</span>
+                          <span style={{fontSize:7,color:"#334155"}}>{o.role}{o.skill?` / ${o.skill}`:""}</span>
+                          {o.delay>0&&!aname&&<span style={{fontSize:7,color:"#fbbf24",background:"#1a1200",padding:"0 5px",borderRadius:6,lineHeight:"15px"}}>~{o.delay}wk delay</span>}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td style={{padding:"4px 8px",verticalAlign:"middle"}}>
+                    {aname?(
+                      <div style={{display:"flex",alignItems:"center",gap:6}}>
+                        <span style={{fontSize:10,color:"#34d399",fontWeight:700}}>{aname}</span>
+                        <button onClick={()=>unassign(o.id)}
+                          style={{fontSize:8,padding:"1px 5px",background:"transparent",border:"1px solid #3b0000",color:"#ef4444",borderRadius:3,cursor:"pointer",lineHeight:"15px"}}>✕</button>
+                      </div>
+                    ):o.suggestion&&!takenSuggestion?(
+                      <div style={{display:"flex",alignItems:"center",gap:5,flexWrap:"wrap"}}>
+                        <span style={{fontSize:9,color:"#6ee7b7",fontStyle:"italic"}}>💡 {o.suggestion}</span>
+                        <button onClick={()=>assign(o.id,o.suggestion)}
+                          style={{fontSize:8,padding:"2px 7px",background:"#052e16",border:"1px solid #10b981",color:"#10b981",borderRadius:4,cursor:"pointer"}}>Accept</button>
+                        <button onClick={()=>setPicker({opp:o,people:cur.people})}
+                          style={{fontSize:8,padding:"2px 7px",background:"#0d1424",border:"1px solid #1e293b",color:"#475569",borderRadius:4,cursor:"pointer"}}>Change</button>
+                      </div>
+                    ):takenSuggestion?(
+                      <div style={{display:"flex",alignItems:"center",gap:5,flexWrap:"wrap"}}>
+                        <span style={{fontSize:9,color:"#ef4444"}}>⚠ {o.suggestion} (taken)</span>
+                        <button onClick={()=>setPicker({opp:o,people:cur.people})}
+                          style={{fontSize:8,padding:"2px 7px",background:"#150505",border:"1px solid #ef4444",color:"#ef4444",borderRadius:4,cursor:"pointer"}}>Pick other</button>
+                      </div>
+                    ):(
+                      <div style={{display:"flex",alignItems:"center",gap:5}}>
+                        <span style={{fontSize:9,color:"#ef4444",fontStyle:"italic"}}>Hire needed</span>
+                        <button onClick={()=>setPicker({opp:o,people:cur.people})}
+                          style={{fontSize:8,padding:"2px 7px",background:"#150505",border:"1px solid #ef4444",color:"#ef4444",borderRadius:4,cursor:"pointer"}}>Assign bench</button>
+                      </div>
+                    )}
+                  </td>
+                  <td style={{padding:"3px 6px",textAlign:"center"}}>
+                    <span style={{fontSize:10,fontWeight:800,color:isGap?"#ef4444":aname?"#34d399":"#fbbf24"}}>{o.tot}</span>
+                  </td>
+                  {o.h.map((v,j)=><WC key={j} v={v} t="d"/>)}
+                </tr>
+              );
+            })}
+            <tr style={{borderTop:"1px solid #0a1020",background:"#050a14"}}>
+              <td style={{padding:"3px 12px",fontSize:9,fontWeight:800,color:"#fbbf24",textTransform:"uppercase",letterSpacing:"0.06em",position:"sticky",left:0,background:"#050a14",zIndex:5}}>Total Demand</td>
+              <td/>
+              <td style={{padding:"3px 6px",textAlign:"center",fontSize:10,fontWeight:800,color:"#fbbf24"}}>{cur.opps.reduce((s,o)=>s+o.tot,0)}</td>
+              {dw.map((v,i)=><td key={i} style={{padding:"1px",textAlign:"center"}}><div style={{fontSize:8,fontWeight:800,color:"#fbbf24",background:"#451a03",borderRadius:2,padding:"2px 0",textAlign:"center"}}>{v||"·"}</div></td>)}
+            </tr>
+
+            {/* NET */}
+            <tr style={{borderTop:"2px solid #1e293b",background:"#050a14"}}>
+              <td style={{padding:"4px 12px",fontSize:10,fontWeight:800,color:"#f1f5f9",textTransform:"uppercase",letterSpacing:"0.08em",position:"sticky",left:0,background:"#050a14",zIndex:5}}>◈ Net (Supply − Demand)</td>
+              <td/>
+              <td style={{padding:"3px 6px",textAlign:"center"}}>
+                {(()=>{const n=cur.people.reduce((s,p)=>s+p.tot,0)-cur.opps.reduce((s,o)=>s+o.tot,0);return<span style={{fontSize:11,fontWeight:800,color:n>=0?"#34d399":"#ef4444"}}>{n>0?`+${n}`:n}</span>;})()}
+              </td>
+              {nw.map((v,i)=><WC key={i} v={v} t="n"/>)}
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      {/* FOOTER */}
+      <div style={{padding:"10px 14px",borderTop:"1px solid #0a1020",display:"flex",gap:16,alignItems:"center",flexWrap:"wrap",background:"#050a14",marginTop:8}}>
+        <span style={{fontSize:8,color:"#1e293b"}}>Color key:</span>
+        {[["Supply available","#34d399","#052e16"],["Overallocated","#ef4444","#2d0000"],["Demand high","#fb923c","#3b1500"],["Net surplus","#34d399","#052e16"],["Net gap","#ef4444","#3b0000"]].map(([l,fg,bg])=>(
+          <div key={l} style={{display:"flex",alignItems:"center",gap:4}}>
+            <div style={{width:22,height:12,background:bg,borderRadius:2,display:"flex",alignItems:"center",justifyContent:"center"}}>
+              <span style={{fontSize:6,color:fg,fontWeight:700}}>hrs</span>
+            </div>
+            <span style={{fontSize:8,color:"#334155"}}>{l}</span>
+          </div>
+        ))}
+        <div style={{flex:1}}/>
+        <span style={{fontSize:8,color:"#1e293b"}}>Assignments saved to browser · NeuraFlash Internal</span>
+      </div>
+
+      {picker&&<Picker opp={picker.opp} people={picker.people} usedNames={usedNames} onPick={name=>{assign(picker.opp.id,name);setPicker(null);}} onClose={()=>setPicker(null)}/>}
+    </div>
+  );
+}
+
+ReactDOM.render(<App/>,document.getElementById("root"));
+</script>
+</body>
+</html>

@@ -256,7 +256,7 @@ function assignTab(role,skill){
   // ── SKILL-FIRST: SA / Consultant / Developer / TA routed by skill ──
   if(s==="Agentforce") return "agentforce";
   if(s==="AWS") return "aws";
-  if(s==="Service Cloud Voice") return "scv";
+  if(s==="Service Cloud Voice"){if(r==="Developer") return "sfta"; return "scv";}
   if(s==="Service Cloud") return "sc";
   if(s==="Field Service") return "fs";
   if(["RLM","CPQ","Billing"].includes(s)) return "rlm";

@@ -222,7 +222,7 @@ function autoAssign(allPeople, allOpps){
           const already=alloc[i]||0;
           const avail=Math.max(0,p.hours[i]||0);
           // Block if: total committed would exceed availability+buffer OR exceed 40h absolute
-          if(already+need>avail+AUTO_STRETCH||already+need>HARD_CAP){wouldBreach=true;break;}
+          if(already+needH>avail+AUTO_STRETCH||already+needH>HARD_CAP){wouldBreach=true;break;}
         }
         if(wouldBreach) return{...p,score:0,grade:"F",color:"#ef4444",reason:"Over capacity"};
         return{...p,...scoreMatch(p,opp,assignedNames,alloc)};
